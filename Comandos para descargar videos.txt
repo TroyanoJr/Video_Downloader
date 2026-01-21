@@ -1,0 +1,133 @@
+Te explico cómo usar yt-dlp con ffmpeg para descargar videos en diferentes calidades:
+
+## 📥 Instalación previa
+
+Primero necesitas instalar:
+- **yt-dlp**: Descargador de videos
+- **ffmpeg**: Para procesamiento de multimedia
+
+### En Windows:
+```bash
+# Instalar yt-dlp
+pip install yt-dlp
+
+# Descargar ffmpeg desde https://ffmpeg.org/download.html
+# Agregar a PATH o colocar en misma carpeta que yt-dlp
+```
+
+### En Linux/Mac:
+```bash
+# Ubuntu/Debian
+sudo apt install yt-dlp ffmpeg
+
+# macOS con Homebrew
+brew install yt-dlp ffmpeg
+```
+
+## 🎬 Comandos para descargar videos
+
+### Listar formatos disponibles:
+```bash
+yt-dlp -F "URL_DEL_VIDEO"
+```
+
+### Descargar en calidad específica:
+
+**1080p:**
+```bash
+yt-dlp -f "bestvideo[height<=1080]+bestaudio/best[height<=1080]" "URL"
+```
+
+**720p:**
+```bash
+yt-dlp -f "bestvideo[height<=720]+bestaudio/best[height<=720]" "URL"
+```
+
+**360p:**
+```bash
+yt-dlp -f "bestvideo[height<=360]+bestaudio/best[height<=360]" "URL"
+```
+
+### Formato más simple - calidad automática:
+```bash
+# Mejor calidad disponible
+yt-dlp -f "best" "URL"
+
+# 1080p o la mejor disponible si no hay 1080p
+yt-dlp -f "best[height<=1080]" "URL"
+```
+
+## 🎵 Descargar solo audio
+
+### Listar formatos de audio:
+```bash
+yt-dlp -F "URL" | findstr "audio"
+```
+
+### Descargar audio en diferentes calidades:
+
+**MP3 320kbps:**
+```bash
+yt-dlp -f "bestaudio" --extract-audio --audio-format mp3 --audio-quality 320K "URL"
+```
+
+**MP3 128kbps:**
+```bash
+yt-dlp -f "bestaudio" --extract-audio --audio-format mp3 --audio-quality 128K "URL"
+```
+
+**Formato original (sin conversión):**
+```bash
+yt-dlp -f "bestaudio" --extract-audio "URL"
+```
+
+**WebM audio:**
+```bash
+yt-dlp -f "bestaudio[ext=webm]" "URL"
+```
+
+## ⚙️ Comandos útiles y combinaciones
+
+### Descargar en formato MP4:
+```bash
+yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --merge-output-format mp4 "URL"
+```
+
+### Descargar playlist completa:
+```bash
+# Videos en 720p
+yt-dlp -f "best[height<=720]" -o "%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s" "URL_PLAYLIST"
+
+# Solo audio de playlist
+yt-dlp -f "bestaudio" --extract-audio --audio-format mp3 --audio-quality 320K -o "%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s" "URL_PLAYLIST"
+```
+
+### Configuración personalizada:
+```bash
+# Carpeta específica y nombre personalizado
+yt-dlp -f "best[height<=1080]" -o "C:/Videos/%(title)s.%(ext)s" "URL"
+
+# Con metadatos
+yt-dlp -f "best[height<=720]" --add-metadata --embed-thumbnail "URL"
+```
+
+## 🎯 Ejemplos prácticos
+
+```bash
+# YouTube 1080p
+yt-dlp -f "bestvideo[height<=1080]+bestaudio/best[height<=1080]" "https://youtube.com/watch?v=..."
+
+# Solo audio alta calidad
+yt-dlp -f "bestaudio" --extract-audio --audio-format mp3 --audio-quality 320K "https://youtube.com/watch?v=..."
+
+# Varios formatos de una vez
+yt-dlp -f "best[height<=720],bestaudio" "https://youtube.com/watch?v=..."
+```
+
+## 💡 Consejos adicionales
+
+- **Siempre usa `-F` primero** para ver qué formatos están disponibles
+- **`bestvideo+bestaudio`** suele dar mejor calidad que `best`
+- **`--merge-output-format mp4`** para asegurar formato MP4
+- **`--no-check-certificate`** si tienes problemas de SSL
+

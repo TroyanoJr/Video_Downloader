@@ -1,0 +1,156 @@
+Te explico todas las formas disponibles para descargar videos con yt-dlp y ffmpeg en los rangos de calidad que especificas:
+
+## 1. Instalación previa
+```bash
+# Instalar yt-dlp
+pip install yt-dlp
+
+# Instalar ffmpeg
+# En Ubuntu/Debian:
+sudo apt install ffmpeg
+# En Windows: descargar desde https://ffmpeg.org/
+```
+
+## 2. Métodos para descargar video (144p - 1100p)
+
+### Opción A: Rango específico de calidad
+```bash
+yt-dlp -f "bestvideo[height<=1100][height>=144]+bestaudio/best[height<=1100][height>=144]"
+```
+
+### Opción B: Calidad específica o la mejor disponible en el rango
+```bash
+yt-dlp -f "best[height<=1100]"
+```
+
+### Opción C: Listar formatos disponibles y elegir manualmente
+```bash
+# Listar todos los formatos
+yt-dlp -F "URL_DEL_VIDEO"
+
+# Descargar formato específico (ejemplo: formato 247 + 251)
+yt-dlp -f 247+251 "URL_DEL_VIDEO"
+```
+
+## 3. Métodos para descargar solo audio
+
+### Audio en 320 kbps
+```bash
+yt-dlp -f "bestaudio[abr<=320]" --extract-audio --audio-format mp3
+```
+
+### Audio en 120 kbps
+```bash
+yt-dlp -f "bestaudio[abr<=120]" --extract-audio --audio-format mp3
+```
+
+### Formatos de audio específicos
+```bash
+# MP3
+yt-dlp -f "bestaudio" --extract-audio --audio-format mp3 --audio-quality 0
+
+# WEBM (Opus)
+yt-dlp -f "bestaudio[ext=webm]" --extract-audio --audio-format webm
+
+# M4A (AAC)
+yt-dlp -f "bestaudio[ext=m4a]" --extract-audio --audio-format m4a
+
+# FLAC (sin pérdida)
+yt-dlp -f "bestaudio" --extract-audio --audio-format flac
+```
+
+## 4. Combinaciones avanzadas
+
+### Descargar video o audio según disponibilidad
+```bash
+# Prioriza video en el rango, si no existe, descarga audio de alta calidad
+yt-dlp -f "bestvideo[height<=1100][height>=144]+bestaudio/best[height<=1100][height>=144]/bestaudio[abr<=320]"
+```
+
+### Descargar múltiples calidades
+```bash
+# Descargar en 720p si existe, sino en la mejor disponible <=1100p
+yt-dlp -f "bestvideo[height=720]+bestaudio/bestvideo[height<=1100]+bestaudio/best[height<=1100]"
+```
+
+## 5. Configuraciones específicas por formato
+
+### Para WebV (Web Video)
+```bash
+yt-dlp -f "bestvideo[ext=webm][height<=1100]+bestaudio[ext=webm]/best[ext=webm][height<=1100]"
+```
+
+### Formatos específicos
+```bash
+# MP4
+yt-dlp -f "bestvideo[ext=mp4][height<=1100]+bestaudio[ext=m4a]/best[ext=mp4][height<=1100]"
+
+# WEBM
+yt-dlp -f "best[ext=webm][height<=1100]"
+
+# AVI
+yt-dlp -f "best[ext=avi][height<=1100]"
+```
+
+## 6. Script automatizado
+
+Puedes crear un script bash (`descargar.sh`):
+```bash
+#!/bin/bash
+
+URL=$1
+TIPO=$2
+
+case $TIPO in
+    "video")
+        yt-dlp -f "bestvideo[height<=1100][height>=144]+bestaudio/best[height<=1100][height>=144]" "$URL"
+        ;;
+    "audio320")
+        yt-dlp -f "bestaudio[abr<=320]" --extract-audio --audio-format mp3 "$URL"
+        ;;
+    "audio120")
+        yt-dlp -f "bestaudio[abr<=120]" --extract-audio --audio-format mp3 "$URL"
+        ;;
+    "webv")
+        yt-dlp -f "best[ext=webm][height<=1100]" "$URL"
+        ;;
+    *)
+        echo "Uso: $0 [URL] [video|audio320|audio120|webv]"
+        ;;
+esac
+```
+
+Usar así: `./descargar.sh "URL" video`
+
+## 7. Configuración permanente
+
+Crear archivo de configuración `~/.config/yt-dlp/config`:
+```ini
+# Preferir formatos hasta 1100p
+-format bestvideo[height<=1100][height>=144]+bestaudio/best[height<=1100][height>=144]
+
+# Carpeta de descargas
+-o ~/Descargas/%(title)s.%(ext)s
+
+# Continuar descargas interrumpidas
+--continue
+```
+
+## 8. Comandos útiles adicionales
+
+### Ver información detallada de formatos
+```bash
+yt-dlp --list-formats "URL_DEL_VIDEO"
+```
+
+### Descargar playlist con condiciones
+```bash
+yt-dlp -f "best[height<=1100]" --yes-playlist "URL_PLAYLIST"
+```
+
+### Limitar tasa de descarga
+```bash
+yt-dlp -f "best[height<=1100]" --limit-rate 1M "URL_DEL_VIDEO"
+```
+
+Estos comandos te permiten descargar contenido en el rango de calidad específico que necesitas, priorizando siempre la mejor calidad disponible dentro de tus parámetros establecidos.
